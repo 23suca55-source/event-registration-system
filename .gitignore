@@ -31,6 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 target/
 *.jar
 node_modules/
+=======
+>>>>>>> 1e81cbca014c55c77dd21d08820e053033e0cec3
