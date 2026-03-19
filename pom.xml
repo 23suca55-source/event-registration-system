@@ -66,6 +66,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.2.5</version>
 				<configuration>
 					<mainClass>com.example.demo.DemoApplication</mainClass>
 				</configuration>
@@ -74,8 +75,4 @@
 		</plugins>
 	</build>
 
-<<<<<<< HEAD
 </project>
-=======
-< /project>
->>>>>>> 1e81cbca014c55c77dd21d08820e053033e0cec3
