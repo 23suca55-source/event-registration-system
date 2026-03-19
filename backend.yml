@@ -23,8 +23,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build with Maven
-        run: mvn clean install
+      - name: Give permission to mvnw
+        run: chmod +x mvnw
+
+      - name: Build with Maven Wrapper
+        run: ./mvnw clean install
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
