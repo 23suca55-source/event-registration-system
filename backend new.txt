@@ -1,0 +1,399 @@
+Eventcontroller.java
+package com.example.demo.controller;
+
+import com.example.demo.model.Event;
+import com.example.demo.repository.EventRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/events")
+@CrossOrigin(origins = "*")
+public class EventController {
+
+    private final EventRepository eventRepository;
+
+    public EventController(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    // GET events
+    @GetMapping
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
+    // ADD event
+    @PostMapping
+    public Event addEvent(@RequestBody Event event) {
+        return eventRepository.save(event);
+    }
+
+    // UPDATE event
+    @PutMapping("/{id}")
+    public Event updateEvent(@PathVariable Long id, @RequestBody Event event) {
+
+        Event e = eventRepository.findById(id).orElseThrow();
+
+        e.setName(event.getName());
+        e.setDate(event.getDate());
+        e.setLocation(event.getLocation());
+
+        return eventRepository.save(e);
+    }
+
+    // DELETE event
+    @DeleteMapping("/{id}")
+    public void deleteEvent(@PathVariable Long id) {
+        eventRepository.deleteById(id);
+    }
+}
+
+Demoapplication.java
+package com.example.demo;
+import org.springframework.context.annotation.Bean;
+import org.springframework.boot.CommandLineRunner;
+
+import com.example.demo.model.Event;
+import com.example.demo.repository.EventRepository;
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+	@Bean
+	CommandLineRunner loadEvents(EventRepository eventRepository) {
+		return args -> {
+
+			if (eventRepository.count() == 0) {
+
+				eventRepository.save(new Event("Tech Talk", "2026-02-10", "Chennai"));
+				eventRepository.save(new Event("AI Workshop", "2026-02-12", "Bangalore"));
+				eventRepository.save(new Event("Web Development Bootcamp", "2026-02-14", "Hyderabad"));
+				eventRepository.save(new Event("Cloud Computing Seminar", "2026-02-16", "Pune"));
+				eventRepository.save(new Event("Data Science Meetup", "2026-02-18", "Coimbatore"));
+				eventRepository.save(new Event("Cyber Security Awareness", "2026-02-20", "Trichy"));
+				eventRepository.save(new Event("Java Full Stack Training", "2026-02-22", "Chennai"));
+				eventRepository.save(new Event("Python for Beginners", "2026-02-24", "Madurai"));
+				eventRepository.save(new Event("Startup & Innovation Talk", "2026-02-26", "Salem"));
+				eventRepository.save(new Event("Mobile App Development", "2026-02-28", "Erode"));
+				eventRepository.save(new Event("UI/UX Design Workshop", "2026-03-02", "Bangalore"));
+				eventRepository.save(new Event("DevOps Fundamentals", "2026-03-04", "Hyderabad"));
+				eventRepository.save(new Event("Machine Learning Basics", "2026-03-06", "Chennai"));
+				eventRepository.save(new Event("IoT & Smart Systems", "2026-03-08", "Tirunelveli"));
+				eventRepository.save(new Event("Final Year Project Guidance", "2026-03-10", "Online"));
+
+				System.out.println("Events inserted");
+			}
+		};
+	}
+
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+}
+
+pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.5</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>com.example</groupId>
+	<artifactId>demo</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>demo</name>
+	<description>Event Registration System</description>
+
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- Web -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- JPA -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- H2 Database -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- DevTools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<mainClass>com.example.demo.DemoApplication</mainClass>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
+
+Registrationrepositiory
+package com.example.demo.repository;
+
+import com.example.demo.model.Registration;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RegistrationRepository extends JpaRepository<Registration, Long> {
+}
+Registration.java
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+
+@Entity
+public class Registration {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+    private String phone;
+
+    @ManyToOne
+    private Event event;
+
+    // getters & setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
+    }
+}
+
+Registration.controller
+package com.example.demo.controller;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.dto.RegistrationRequest;
+import com.example.demo.model.Event;
+import com.example.demo.model.Registration;
+import com.example.demo.repository.EventRepository;
+import com.example.demo.repository.RegistrationRepository;
+
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = "*")
+public class RegistrationController {
+
+    private final RegistrationRepository registrationRepository;
+    private final EventRepository eventRepository;
+
+    public RegistrationController(RegistrationRepository registrationRepository,
+                                  EventRepository eventRepository) {
+        this.registrationRepository = registrationRepository;
+        this.eventRepository = eventRepository;
+    }
+
+    // REGISTER
+    @PostMapping("/register")
+    public Registration register(@RequestBody RegistrationRequest request) {
+
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        Registration registration = new Registration();
+        registration.setName(request.getName());
+        registration.setEmail(request.getEmail());
+        registration.setPhone(request.getPhone());
+        registration.setEvent(event);
+
+        return registrationRepository.save(registration);
+    }
+
+    // GET REGISTRATIONS
+    @GetMapping("/registrations")
+    public List<Registration> getAllRegistrations() {
+        return registrationRepository.findAll();
+    }
+
+    // TEST
+    @GetMapping("/test")
+    public String testRegister() {
+
+        List<Event> events = eventRepository.findAll();
+
+        if (events.isEmpty()) {
+            return "❌ No events found. Open /api/events first";
+        }
+
+        Event event = events.get(0);
+
+        Registration r = new Registration();
+        r.setName("Browser User");
+        r.setEmail("browser@test.com");
+        r.setPhone("1234567890");
+        r.setEvent(event);
+
+        registrationRepository.save(r);
+
+        return "✅ Registration saved for event: " + event.getName();
+    }
+}
+registrationrequest.java
+package com.example.demo.dto;
+public class RegistrationRequest {
+
+    private Long eventId;
+    private String name;
+    private String email;
+    private String phone;
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+}
+backend.yml
+name: Backend CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Analyze Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Give permission to mvnw
+        run: chmod +x mvnw
+
+      - name: Build with Maven Wrapper
+        run: ./mvnw clean install
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
