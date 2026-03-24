@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.RegistrationRequest;
 import com.example.demo.model.Event;
@@ -29,7 +31,7 @@ public class RegistrationController {
     public Registration register(@RequestBody RegistrationRequest request) {
 
         Event event = eventRepository.findById(request.getEventId())
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
 
         Registration registration = new Registration();
         registration.setName(request.getName());

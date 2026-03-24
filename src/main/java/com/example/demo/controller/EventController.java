@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Event;
 import com.example.demo.repository.EventRepository;
+import com.example.demo.repository.RegistrationRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,9 +15,11 @@ import java.util.List;
 public class EventController {
 
     private final EventRepository eventRepository;
+    private final RegistrationRepository registrationRepository;
 
-    public EventController(EventRepository eventRepository) {
+    public EventController(EventRepository eventRepository, RegistrationRepository registrationRepository) {
         this.eventRepository = eventRepository;
+        this.registrationRepository = registrationRepository;
     }
 
     // GET events
@@ -33,7 +38,8 @@ public class EventController {
     @PutMapping("/{id}")
     public Event updateEvent(@PathVariable Long id, @RequestBody Event event) {
 
-        Event e = eventRepository.findById(id).orElseThrow();
+        Event e = eventRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
 
         e.setName(event.getName());
         e.setDate(event.getDate());
@@ -45,6 +51,11 @@ public class EventController {
     // DELETE event
     @DeleteMapping("/{id}")
     public void deleteEvent(@PathVariable Long id) {
+        if (!eventRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found");
+        }
+
+        registrationRepository.deleteByEventId(id);
         eventRepository.deleteById(id);
     }
 }
